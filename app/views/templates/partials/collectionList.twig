@@ -1,0 +1,18 @@
+<div class="col-md-4 col-md-offset-6" >
+	<form id="viewCollections" method="POST" action="{{ path_for('collections.post') }}">
+		<label for="collections">View Collection: </label>
+		<select id="collections" name="collections">
+			{% for collection in collections %}
+				<option value="{{ collection.collection_id }}" 
+					{% if collection.collection_id == id.id %}
+						selected
+					{% endif %}>
+
+					{{ collection.collection }}
+				</option>
+			{% endfor %}
+		</select>
+		<button type="submit" class="btn btn-default">Go</button>
+		{{ csrf.field | raw }}
+	</form>
+</div>

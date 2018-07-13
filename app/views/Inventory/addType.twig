@@ -1,0 +1,289 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory{% endblock %}
+        {% block javascript %}            
+        
+
+        <script type="text/javascript">
+
+        $(document).ready(function() {
+            
+           
+            //Hide Items by default
+            //Hide Right side
+            $(".newPropType").hide();
+            //Hide 3rd and 4th attributes until required
+            $("#attr3").hide();
+            $("#attr4").hide();
+            //Hide add 4th attr until 3rd is used.
+            $("#useAtt4").hide();
+
+            //set focus
+            $("#name").focus();
+
+            //set properties to js so can compare the new entries, prevent duplicates
+            var propertiesObjects = {{ properties | json_encode | raw }};
+            var properties =[];
+            $.each(propertiesObjects, function(){
+                properties.push(this.property.toUpperCase());              
+            });
+
+
+            //Add a new property instead of using the existing one
+            $(".newPropA").click(function() {
+                //toggle visiility of new form on right side
+                $(this).parent().next().toggle();//.css('visibility','visible');
+
+                //Reset to "" and toggle existing property to disabled. 
+                if($(this).parent().next().find(".newPropName").prop('disabled')) {                  
+                    showNew($(this));
+                } else { 
+                    defaultShow($(this));
+                }
+            });
+
+            //Prevent the same property from being selected multiple times
+            $(".propertySelect").on('click',function() {                
+                var otherVals = [];
+                //to be able to reference the this var iniside the function
+                var that = this;
+               //gets an array of all the other values
+                $(".propertySelect").each(function() {
+                    if(this !== that){                       
+                     otherVals.push(this.value);
+                    }
+                });
+                
+                //if it's already been selected, set to "", will nag
+                if(otherVals.includes(this.value)){
+                    this.value = "";
+                }
+            });
+
+            //Prevents adding a new property that already exists
+            $(".newPropName").on('blur',function() {  
+                //console.log(properties);
+                if(properties.includes(this.value.toUpperCase())) {
+                    this.value = "";
+                }
+            });
+
+            function defaultShow(that) {
+                that.parent().prev().find(".propertySelect").prop('disabled', false);
+
+                that.parent().next().find(".typeSelect").prop('disabled', true);                
+                that.parent().next().find(".newPropName").val( '' );
+                that.parent().next().find(".newPropName").prop('disabled', true);
+            }
+
+            function showNew(that) {                
+                that.parent().prev().find(".propertySelect").prop('disabled', true);
+                
+                that.parent().next().find(".typeSelect").prop('disabled', false);
+                that.parent().next().find(".newPropName").prop('disabled', false);
+            }
+
+            $('.showProp').on('click',function() {
+                //show this prop
+                //remove this div
+                //if 3rd show 4th 
+                $(this).parent().next().show();
+                //enable the existing property select
+                $(this).parent().next().find('.propertySelect').prop('disabled', false);
+
+                //Third attr
+                if($(this).parent().attr('id') === 'useAtt3'){
+                     $("#useAtt4").show();
+                }
+
+                $(this).remove();
+            });
+
+            var old = {{ old |json_encode|raw }};
+            console.log(old);
+        });
+    </script>
+{% endblock %}
+
+{% block content %}
+
+{% if old%}
+Old exists {{ old.size }}
+{% endif %}
+    <div class="row">
+        <div class="col-md-12 ">
+            <div class="panel panel-default">
+                <div class="panel-heading">New Inventory Type <img height = '16' width = '16' src = "{{ base_url() }}/images/info.png" title='This page allows you to add a new Item Type.  You need to add at least 2 properties, with the option to add up to 4' /></div>
+                <div class="panel-body">
+                        
+                <form id="padded" class action="{{ path_for('inventory.addType') }}" method="post" autocomplete="off">
+                        <div class="properties">
+                            <div class="form-group{{ errors.name ? ' has-error' : '' }}" >
+                                <label for="name">Name</label>
+                                 <input type="text" maxlength=25 id="name" name="name" class="form-control" required value="{{ old.name }}">
+                                 {% if errors.name %}
+                                    <span class="help-block">{{ errors.name | first }}</span>
+                                {% endif %}                            
+                            </div>
+                            <div class="form-group {{ errors.markup ? ' has-error' : '' }}" >
+                                <label for="name">Markup Multiplier</label>
+                                 <input type="number" step="0.01" min=1 width=4 id="markup" name="markup" value="{{ old.markup }} class="form-control" placeholder="eg 1.2 for 20%">
+                                 {% if errors.markup %}
+                                    <span class="help-block">{{ errors.markup | first }}</span>
+                                {% endif %}                           
+                            </div>
+                            </p />                            
+                        </div>
+
+                        {# Attribute 1 #}
+                        <div title="Attribute 1" class="col-md-10 floatLeft properties {{ errors.attrib_1 ? ' has-error' : '' }}" >                         
+                            <div class="col-md-3">
+                                <label for="property1">Existing Property</label>
+                                <select id="property1" name="property1" class="propertySelect" required>  
+                                    <option value="" > - Property - </option>                      
+                                    {% for property in properties %}
+                                        <option value="{{ property.id }}" >
+                                            {{ property.property }} ( {{ property.dataType }} )
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-2 col-md-offset-1"><a class="newPropA" href="#">Create new Property</a></div> 
+
+                            <div class="col-md-4 newPropType">
+                                <label for="attrib_1_new">Enter New Property Type</label>
+                                 <input class="newPropName" type="text" maxlength=25 id="attrib_1_new" name="attrib_1_new" class="form-control"  required disabled>
+                                 {% if errors.attrib_1_new %}
+                                    <span class="help-block">{{ errors.attrib_1_new | first }}</span>
+                                {% endif %}                            
+                            
+                                <select class="typeSelect" id="type1" name="type1" required disabled>
+                                    <option value="">- Property Type -</option>
+                                    <option value="String" >String</option>
+                                    <option value="Number" >Number</option>
+                                    <option value="Decimal" >Decimal</option>
+                                    <option value="Boolean" >Boolean</option>
+                                </select>
+                            </div>    
+                        </div>    
+
+
+
+                        {# Attribute 2 #}
+                        <div title="Attribute 2" class="col-md-10 floatLeft properties {{ errors.attrib_2 ? ' has-error' : '' }}" >                         
+                            <div class="col-md-3">
+                                <label for="property2">Existing Property</label>
+                                <select id="property2" name="property2" class="propertySelect" required>  
+                                    <option value="" > - Property - </option>                      
+                                    {% for property in properties %}
+                                        <option value="{{ property.id }}" >
+                                           {{ property.property }} ( {{ property.dataType }} )
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-2 col-md-offset-1"><a class="newPropA" href="#">Create new Property</a></div>
+
+                            <div class="col-md-4 newPropType">
+                                <label for="attrib_2_new">Enter New Property Type</label>
+                                 <input class="newPropName" type="text" maxlength=25 id="attrib_2_new" name="attrib_2_new" class="form-control"  required disabled>
+                                 {% if errors.attrib_2_new %}
+                                    <span class="help-block">{{ errors.attrib_2_new | first }}</span>
+                                {% endif %}                            
+                            
+                                <select class="typeSelect" id="type2" name="type2" required disabled>
+                                    <option value="">- Property Type -</option>
+                                    <option value="String" >String</option>
+                                    <option value="Number" >Number</option>
+                                    <option value="Decimal" >Decimal</option>
+                                    <option value="Boolean" >Boolean</option>
+                                </select>
+                            </div>    
+                        </div>    
+
+
+
+                        {# Attribute 3 #}
+                        <div id='useAtt3' class="useNextAtt floatLeft"><a class="showProp" href="#">Add Property</a></div>   
+                        <div id='attr3' caption="Attribute 3" class="col-md-10 floatLeft properties {{ errors.attrib_3 ? ' has-error' : '' }}" >                         
+                            <div class="col-md-3">
+                                <label for="property3">Existing Property</label>
+                                <select id="property3" name="property3" class="propertySelect" required disabled>  
+                                    <option value="" > - Property - </option>                      
+                                    {% for property in properties %}
+                                        <option value="{{ property.id }}" >
+                                           {{ property.property }} ( {{ property.dataType }} )                                            
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                           <div class="col-md-2 col-md-offset-1"><a class="newPropA" href="#">Create new Property</a></div>
+
+                            <div class="col-md-4 newPropType">
+                                <label for="attrib_3_new">Enter New Property Type</label>
+                                 <input class="newPropName form-control" type="text" maxlength=25 id="attrib_3_new" name="attrib_3_new" required disabled>
+                                 {% if errors.attrib_3_new %}
+                                    <span class="help-block">{{ errors.attrib_3_new | first }}</span>
+                                {% endif %}                            
+                            
+                                <select class="typeSelect" id="type3" name="type3" required disabled>
+                                    <option value="">- Property Type -</option>
+                                    <option value="String" >String</option>
+                                    <option value="Number" >Number</option>
+                                    <option value="Decimal" >Decimal</option>
+                                    <option value="Boolean" >Boolean</option>
+                                </select>
+                            </div>    
+                        </div>    
+
+
+
+                        {# Attribute 4 #}
+                        <div id='useAtt4' class="useNextAtt floatLeft"><a class="showProp" href="#">Add Property</a></div>
+                        <div id='attr4' title="Attribute 4" class="col-md-10 floatLeft properties {{ errors.attrib_4 ? ' has-error' : '' }}" >                         
+                            <div class="col-md-3">
+                                <label for="property4">Existing Property</label>
+                                <select id="property4" name="property4" class="propertySelect" required disabled>  
+                                    <option value="" > - Property - </option>                      
+                                    {% for property in properties %}
+                                        <option value="{{ property.id }}" >
+                                           {{ property.property }} ( {{ property.dataType }} )
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-2 col-md-offset-1"><a class="newPropA" href="#">Create new Property</a></div>
+
+                            <div class="col-md-4 newPropType">
+                                <label for="attrib_4_new">Enter New Property Type</label>
+                                 <input class="newPropName" type="text" maxlength=25 id="attrib_4_new" name="attrib_4_new" class="form-control"  required disabled>
+                                 {% if errors.attrib_4_new %}
+                                    <span class="help-block">{{ errors.attrib_4_new | first }}</span>
+                                {% endif %}                            
+                            
+                                <select class="typeSelect" id="type4" name="type4" required disabled>
+                                    <option value="">- Property Type -</option>
+                                    <option value="String" >String</option>
+                                    <option value="Number" >Number</option>
+                                    <option value="Decimal" >Decimal</option>
+                                    <option value="Boolean" >Boolean</option>
+                                </select>
+                            </div>    
+                        </div>    
+
+                        <button type="submit" class="btn btn-success form-control">Create</button>
+
+                        <div id='hidden'></div>
+                       {{ csrf.field | raw }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

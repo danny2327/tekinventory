@@ -1,0 +1,131 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory - Home{% endblock %}
+
+    {% block javascript %}            
+    
+
+    <script type="text/javascript">
+
+          $(document).ready(function() 
+          {
+            //shows the new sale fields
+             buildNew();
+
+            $('#oldNew').on('change', function() {
+               console.log('Changed')
+                if($('#oldNew').val() === 'new') {
+                   console.log('..to new');
+                  //show fields
+                  $('#soldDiv').html("");   
+                  buildNew();               
+                }
+                else {
+                  console.log('..to existing');
+                  console.log( $('#soldDiv'));
+                  $('#soldDiv').html("");
+                  buildOld();
+                  //make ajax call
+                  //2 params:
+                  //true = all entries, false = 10 
+                  makeAjaxCall(false);
+                }
+            });
+
+            function buildNew(){
+              var labelClient = $('<label>')
+                .attr({for:'client'})
+                .text("Client");
+
+              var inputClient = $('<input>')
+                .attr({class:'form-group',type:'text',id:'client',name:'client',required:'required'});
+
+             var labelNotes = $('<label>')
+                .attr({for:'notes'})
+                .text("Notes");
+ 
+              var inputNotes = $('<input>')
+                .attr({id:'notes',name:'notes',class:'form-group',type:'text'});
+
+
+              $('#soldDiv').append(labelClient,inputClient,'<br>',labelNotes,inputNotes);
+            }
+
+             function buildOld(){
+              var select = $('<select>')
+                .attr({id:'sales',name:'sales'});
+
+              $('#soldDiv').append(select); 
+
+             }
+
+
+
+            function makeAjaxCall(all) {
+              $.ajax({
+                    url: "{{ path_for('collections.ajaxPrevSales') }}", 
+                    data: {
+                        all: all
+
+                    },
+                    type: "POST",
+                    dataType : "json",
+                })
+
+                .done(function( result ) {
+                    
+                 // const sales = $('#sales');
+                    let output = '';
+                   $.each(result,function(key, value){  
+
+                      output += `<option value ="${value.id}">${value.client}, ${value.collection}, ${value.notes}, ${value.created_at}, </option>`;
+
+                    });
+
+                    $('#sales').append(output);
+                   
+                })
+
+                .fail(function( xhr, status, errorThrown ) {
+                  alert(  "Error: " + errorThrown );
+                  console.log( "Error: " + errorThrown );
+                  console.log( "Status: " + status );
+                  console.dir( xhr );
+                })
+            }
+          
+
+          });
+    </script>
+    {% endblock %}
+
+{% block content %}
+<p />
+         
+<div class="col-md-12" id='pageTitle'>Sold Items</div>
+
+<div class="col-md-10">
+
+<form method="post" action="{{ path_for('collections.markSold.post') }}">
+ 
+<!-- 
+  new entry or existing (new default)
+  ajax call to load 10, with option for more
+
+ -->
+ <select id="oldNew" class='form-group'>
+   <option value='new'>New Sale</option>
+   <option value='old'>Add to Existing Sale</option>
+ </select>
+
+
+<div id="soldDiv" class='form-group'></div>
+
+  <div id='btn' class="col-md-12 col-md-offset-10 form-group">
+    <button type="submit" class="btn btn-default">Archive</button>
+  </div>
+     
+     
+    </form>
+   
+{% endblock %}

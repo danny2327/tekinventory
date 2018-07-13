@@ -1,0 +1,104 @@
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory - Home{% endblock %}
+ {% block javascript %}     
+     <script type="text/javascript">
+
+        $(document).ready(function(){   
+             
+            $(".quantity").click(function() {
+             $('.submit').prop('disabled', false);                
+            });
+
+        });
+    </script>
+{% endblock %} 
+
+{% block content %}
+  <div class="col-md-8">
+  {% if items is empty %}
+    No Items in this category
+  {% endif %}
+  <form method="post" action="{{ path_for('inventory.addStock.post') }}">
+  <div class="col-md-6 col-md-offset-6" >
+    
+<!-- Not using this for now, just add to warehouse - will have to figure out what to refresh, ie it's showing the quantities for the warehouse, so would have to change each quantity, or maybe refresh the whole thing, but then not all the items are in each collection so you would get the errors, so would have to create them...
+    <label for="collections">Add to Collection: </label>
+    <select id="collections" name="collections">
+      {% for collection in collections %}
+        <option value="{{ collection.collection_id }}">
+          {{ collection.collection }}
+        </option>
+      {% endfor %}
+    </select> -->
+
+    <button id='submit' type="submit" class="submit btn btn-default" disabled>Add To Warehouse</button>
+
+  </div>
+ 
+  {% for item in items  %}
+     {% if currentType != item.itemType_id %}
+        </tbody>
+          </table>
+     <table class="table table-bordered table-striped">
+      <caption>
+        
+        {# to account for the different format of 'item' in the regular and search modes #} 
+        {% if item.itemType.itemType %}
+          {{ item.itemType.itemType }}
+        {% else %}
+          {{ item.itemType }}
+        {% endif %}
+      </caption>
+            <thead>      
+              <tr>
+                <th>Item ID </th>
+                
+                <!--Gets and outputs the appropriate property names.
+                Counts number of properties, and only displays that many columns
+                the If statement ensures the correct properties are displayed -->
+                {% set columns = 0 %}
+                {% for property in propertiesList %}
+                  {% if property.itemtype.id == item.itemType_id %}
+                    <th>{{ property.property.property }}</th>
+                    {% set columns = columns  + 1  %}
+                  {% endif %}
+                {% endfor %}
+
+                <th>Description</th>
+                <th>Quantity</th>
+                <th>Add</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% endif %}
+               {% set currentType = item.itemType_id %}
+              <tr>
+                <td><a href="{{ path_for('inventory.edit.item', {'id':item.item_id}) }}">{{ item.item_id }}</a></td> 
+                <td>{{ item.attrib_1 }}</td>
+                <td>{{ item.attrib_2 }}</td>
+                {% if columns > 2 %}
+                  <td>{{ item.attrib_3 }}</td>
+                {% endif %}
+                {% if columns > 3 %}
+                  <td>{{ item.attrib_4 }}</td>
+               {% endif %}
+                <td>{{ item.desc }}</td>
+                <td>  {% if quantities[item.item_id] > -1 %}  {# > -1 makes it check if it's a digit i guess? I don't fucking know, it just works #}
+                         {{ quantities[item.item_id] }}
+                     {% else %}
+                        0
+                     {% endif %} 
+                </td>
+                
+                <td><input class="quantity cellNumber" type="number" value=0 min=0 name="{{ item.item_id }}" /></td>
+              </tr>
+        </div>
+
+      {% endfor %}
+        </tbody>
+      </table>
+          <div class="col-md-6 col-md-offset-6" >
+            <button id='submit' class='submit' type="submit" class="btn btn-default" disabled>Add To Warehouse</button>
+          </div> 
+      </form>
+{% endblock %}

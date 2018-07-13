@@ -1,0 +1,105 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory{% endblock %}
+        {% block javascript %}            
+        
+
+        <script type="text/javascript">
+
+	        $(document).ready(function() 
+			{
+				var collections = {{ collections|json_encode|raw }};
+
+				var otherColls = [];
+
+				$("#collection").on('change', function(){  
+					$('#name').val($('#collection option:selected').text().trim());
+					//for determining if anything has changed (after submit)
+					var origProt = 0;
+					var origName = '';
+
+					$.each(collections, function(key,collection){
+									
+						//if it's the selected field		
+						if($("#collection").val() == collection.collection_id){
+							//set origName adn origProt to the current collection
+							origName = collection.collection;
+							origProt = collection.protected;
+
+							//sets the protected field
+							if(collection.protected == 1) {								
+								$('#protected').prop({'checked':true});
+							} else {								
+								$('#protected').prop({'checked':false});
+							}							
+						} else {
+							otherColls.push(collection.collection);
+						}
+					});					
+
+					$('#origProt').attr({value:origProt});
+					$('#origName').attr({value:origName});
+				});
+
+				/*$('#name').on('blur',function() {
+					console.log($('#name').val());
+					console.log($("#collection").val());
+					console.log(collections[1]);
+					console.log(collections[$("#collection").val()]);
+					if(otherColls.includes($('#name').val)) {
+						$('#name').val = collections[$("#collection").val()];
+						alert("dup");
+					}
+				});*/
+			});
+    </script>
+    {% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">Edit Collection <img height = '16' width = '16' src = "{{ base_url() }}/images/info.png" title='This page allows you to edit the selected collection' /></div>
+                <div class="panel-body"> 
+				    <form id="padded" action="{{ path_for('collections.update.post') }}" method="post" autocomplete="off">
+				        <div class="form-group">
+					        <label for="collection">Edit Collection: </label>
+					        <select id="collection" name="collection" class='form-control'>
+					        <option></option>                            
+					            {% for collection in collections %}                	
+					                <option value="{{ collection.collection_id }}" 
+					                    {% if collection.collection_id == -1 %}
+					                        selected
+					                    {% endif %}>
+					                    {{ collection.collection }}
+					                </option>
+					            {% endfor %}
+					        </select>
+
+					        <div class="form-group{{ errors.name ? ' has-error' : '' }} " >
+					            <label for="name">Name</label>
+					             <input type="text" maxlength=25 id="name" name="name" class="form-control" required>
+					             {% if errors.name %}
+					                <span class="help-block">{{ errors.name | first }}</span>
+					            {% endif %} 
+
+				                <input type="hidden" id="origName" name="origName">				
+					        </div>
+
+				 	         <div class="form-group" >
+				                <label for="protected"  title="If the collection is protected, it cannot be deleted or archived.">Protected</label>
+				                <input type="checkbox" id="protected" class='floatLeft' name="protected" title="If the collection is protected, it cannot be deleted or archived.">
+				                <input type="hidden" id="origProt" name="origProt">
+				            </div> 
+
+					        <button type="submit" class="form-control btn btn-success">Submit</button>
+				        </div>
+				    </form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}

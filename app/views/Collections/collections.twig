@@ -1,0 +1,125 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory - Home{% endblock %}
+    {% block javascript %}            
+    
+
+    <script type="text/javascript">
+
+          $(document).ready(function() 
+          {
+
+            $(".moreQuan").click(function() {
+                               
+                var v = $(this).parent().parent().children(":first-child").text();  
+                
+                $.ajax({
+                    url: "{{ path_for('collections.ajaxOtherQuan') }}", 
+                    data: {
+                        id: v
+                    },
+                    type: "POST",
+                    dataType : "json",
+                })
+
+                .done(function( result ) {
+                    
+                    var quans = "";
+                   $.each(result,function(key, value){  
+                      quans += key + " = " + value + "\n";
+
+                        //$("#hidden").html('<input type="hidden" id="id" name="id" value="'+v+'"></input>'); 
+
+                    });
+                alert(quans);
+                })
+
+                .fail(function( xhr, status, errorThrown ) {
+                alert(  "Error: " + errorThrown );
+                console.log( "Error: " + errorThrown );
+                console.log( "Status: " + status );
+                console.dir( xhr );
+              })
+
+              // Code to run regardless of success or failure;
+              .always(function( xhr, status ) {
+                
+                }); 
+    
+
+            });
+
+
+    });
+    </script>
+    {% endblock %}
+{% block content %}
+<p />
+
+
+{% include 'templates/partials/CollectionList.twig' %}
+
+<div class="col-md-12" id='pageTitle'>
+  Viewing all Collections  <!-- Shows title of collection (-1 because of 0 start) -->
+</div>
+
+<div class="col-md-10">
+{% if items is empty %}
+  No Items in this category
+{% endif %}
+
+{% for item in items  %}
+     {% if currentType != item.itemType_id %}
+        </tbody>
+          </table>
+     <table class="table table-bordered table-striped">
+            <caption>
+            	{{ item.itemType.itemType }}s
+            </caption>
+            <thead>               
+              <tr>
+                <th>Item ID </th>
+                <th>Item Type</th>
+
+                <!--Gets and outputs the appropriate property names.
+                Counts number of properties, and only displays that many columns
+                the If statement ensures the correct properties are displayed -->
+                {% set columns = 0 %}
+                {% for property in propertiesList %}
+                  {% if property.itemtype.id == item.itemType_id %}
+                    <th>{{ property.property.property }}</th>
+                    {% set columns = columns  + 1  %}
+                  {% endif %}
+                {% endfor %}
+
+                <th>Description</th>
+                <th>Quantity</th>
+
+              </tr>
+            </thead>
+            <tbody>
+              {% endif %}
+               {% set currentType = item.itemType_id %}
+              <tr>
+                <td>{{ item.item_id }}</td>
+                <td>{{ item.itemType.itemType }}</td>
+                <td>{{ item.attrib_1 }}</td>
+                <td>{{ item.attrib_2 }}</td>
+                {% if columns > 2 %}
+                  <td>{{ item.attrib_3 }}</td>
+                {% endif %}
+                {% if columns > 3 %}
+                  <td>{{ item.attrib_4 }}</td>
+               {% endif %}
+                <td>{{ item.desc }}</td>
+                <td>{{ quantities[item.item_id] }} </td>
+                
+              </tr>
+
+        </div>
+
+      {% endfor %}
+
+        </tbody>
+      </table>
+{% endblock %}

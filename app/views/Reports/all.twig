@@ -1,0 +1,121 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory{% endblock %}
+        {% block javascript %}            
+        
+
+        <script type="text/javascript">
+
+          /*var items =  {{ items|json_encode|raw }}
+
+          var searchFilter = document.getElementById('searchFilter');
+          searchFilter.addEventListener('keyup',search);
+
+          function search() {
+            console.log(searchFilter.value);
+            //console.log(items);
+            //showAll();
+            let sf = searchFilter.value.toUpperCase();
+            const table_rows = document.querySelectorAll('.idtd');
+            //console.log(table_rows);
+            items.forEach(function(item){
+              //if don't match
+              if(sf !== item.attrib_1.toUpperCase() || sf !== item.attrib_2.toUpperCase() || sf !== item.attrib_3.toUpperCase() || sf !== item.attrib_4.toUpperCase() || sf !== item.desc.toUpperCase() || sf !== item.itemType.itemType.toUpperCase() || sf !== item.vendor.toUpperCase() || sf !== item.vendor_sku.toUpperCase()   ) {
+
+                  table_rows.forEach(function(row){
+                    console.log('row: '+row.textContent);
+                    console.log('item: '+item.item_id);
+                    if(row.textContent === item.item_id){
+                      console.log(row);
+                       // hideRow(row);
+                    }
+                  });
+
+              }
+
+            });
+          }
+
+          function hideRow(x){
+              x.parentElement.style.display = "none";            
+          }
+
+          function showAll() {
+            items.forEach(function(item){
+              item.parentElement.style.display = "block";   
+            });
+          }*/
+
+
+/*        $(document).ready(function() {
+        });*/
+    </script>
+    {% endblock %}
+{% block content %}
+    <div class="col-md-8">
+{% if items is empty %}
+  No Items in this category
+{% endif %}
+<!-- 
+<div class='col-md-4 offset-2' id="filterDiv"></div>
+<form id="filter">
+  <label for='searchFilter'>Filter</label>
+  <input type='text' name="searchFilter" id="searchFilter">
+</form> 
+</div> -->
+
+{% for item in items  %}
+     {% if currentType != item.itemType_id %}
+        </tbody>
+          </table>
+     <table class="table table-bordered table-striped">
+      <caption>{{ item.itemType.itemType }}</caption>
+            <thead>      
+              <tr>
+                <th>Item ID </th>
+                
+                <!--Gets and outputs the appropriate property names.
+                Counts number of properties, and only displays that many columns
+                the If statement ensures the correct properties are displayed -->
+                {% set columns = 0 %}
+                {% for property in propertiesList %}
+                  {% if property.itemtype.id == item.itemType_id %}
+                    <th>{{ property.property.property }}</th>
+                    {% set columns = columns  + 1  %}
+                  {% endif %}
+                {% endfor %}
+
+                <th>Description</th>
+                <th>Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% endif %}
+               {% set currentType = item.itemType_id %}
+              <tr>
+                <td class='idtd'>{{ item.item_id }}</td>
+                <td>{{ item.attrib_1 }}</td>
+                <td>{{ item.attrib_2 }}</td>
+                {% if columns > 2 %}
+                  <td>{{ item.attrib_3 }}</td>
+                {% endif %}
+                {% if columns > 3 %}
+                  <td>{{ item.attrib_4 }}</td>
+               {% endif %}
+                <td>{{ item.desc }}</td>
+                <td>
+                  {% if( quantities[item.item_id] is defined) %}
+                    {{ quantities[item.item_id] }}
+                  {% else %}
+                    0
+                  {% endif %}
+
+                </td>
+              </tr>
+
+        </div>
+
+      {% endfor %}
+        </tbody>
+      </table>
+{% endblock %}

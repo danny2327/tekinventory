@@ -1,0 +1,94 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory - Home{% endblock %}
+	{% block javascript %}
+		<script>
+    $(document).ready(function() 
+    {
+        $("#one").siblings("div").css('color','red');
+       
+    });
+</script>
+	{% endblock %}
+{% block content %}
+    <div class="container  center-block">
+        <div class="row">
+            <h2 class="mx-auto">   
+                Welcome to the all new TekInventory!
+            </h2> 
+         </div>
+
+        <div class="row">
+             <img src="{{ base_url() }}/images/Tekworks-Image.jpg" alt="Get some coffee, you're gonna need it." title="Get some coffee, you're gonna need it.">
+             <hr>
+        </div>
+        <div class="row">
+            <h1>Site Overview</h1>
+
+            <div class="col-md-12  help-list">
+                This website allows you to track, add and mark as sold all of the items that Tekworks uses <p /><p />
+
+                There are items, itemtypes, and collections:
+                <strong>Item Types</strong> are categories of items, for instance an ethernet cable, a video card or a stick of ram.  You define a set of properties for each item type, such as a length, model or BUS Interface, and choose a corresponding "data type".  This will be one of the following: <p />
+                <ul>
+                <li><strong>String: </strong>Words, letters or a sentence</li>
+                <li><strong>Number: </strong>Any integer or 0</li>
+                <li><strong>Decimal: </strong>Any decimal number or 0</li>
+                <li><strong>Boolean: </strong>A Yes/No or True/False value, ie A router: wireless would be a boolean.</li>
+                </ul> <p />
+
+                <strong>Items</strong> are of an item type and you will fill in all of the properties of that item type  <p />
+
+                <strong>Collections</strong> are groups of items, and their corresponding quantities.  The warehouse is the default collection, and a collection should be created for each job, as well as employee's car kits.  A collection can be archived, meaning items in that collection are marked as sold, and any unused items will be put back in the warehouse.  A collection can be 'protected' meaning that it can not be archived.    <p />
+
+            </div>
+        </div>
+
+        <div class="row">
+            <h1>Menu Overview</h1>
+
+            <div class="col-md-8">
+               
+                <div class="row mb-3 help-title"><strong>The <em>Inventory</em> button lets you manage the items in the inventory</strong></div>
+
+                <div class="row mb-3 help-list"><strong>New Item: </strong> Define a new item, choose the type, and enter properties</div>
+                <div class="row mb-3 help-list"><strong>New Item Category: </strong> Define an Item Type including required properties and their types </div>
+                <div class="row mb-3 help-list"><strong>View Inventory: </strong> See all inventory, regardless of collection</div>
+                <div class="row mb-3 help-list"><strong>View Category: </strong> See all of the items of a particular Item Type </div>
+                <div class="row mb-3 help-list"><strong>Add Stock: </strong> Increase the quantity of particular item[s] after receiving an order</div>
+                <div class="row mb-3 help-list"><strong>View Low Stock: </strong> Will show a list of items that have hit their preset thresholds, and need to be reordered</div>
+            </div>
+        </div> <p /><hr>
+        <div class="row">
+            <!-- <div class="col-md-2">
+                  <img src="{{ base_url() }}/images/help-Inventory179.png" alt="">
+            </div> -->
+            <div class="col-md-8">
+               
+                <div class="row mb-3 help-title"><strong>The <em>Collections</em> button allows you manage the collections </strong></div>
+
+                <div class="row mb-3 help-list"><strong>New Collection: </strong> Define a new Collection, such as an employee's car or job name</div>
+                <div class="row mb-3 help-list"><strong>View Collection: </strong>Select a collection and </div>
+                <div class="row mb-3 help-list"><strong>Edit Collection: </strong>Edit the name/protected status of a collection </div>
+                <div class="row mb-3 help-list"><strong>Archive Collection: </strong> Select a collection, decide what to do with any items in it, and then delete it.</div>
+                
+            </div>
+        </div>   <p /><hr>
+        <div class="row">
+            <!-- <div class="col-md-2">
+                  <img src="{{ base_url() }}/images/help-Inventory179.png" alt="">
+            </div> -->
+            <div class="col-md-8">
+               
+                <div class="row mb-3 help-title"><strong>The <em>Administration</em> button allows you administer the site. Only seen if user is an administrator </strong></div>
+
+                <div class="row mb-3 help-list"><strong>New User: </strong> Create a new User</div>
+                <div class="row mb-3 help-list"><strong>Manage Users: </strong>View, edit and delete users</div>
+                <div class="row mb-3 help-list"><strong>Reports: </strong> Access the various reports </div>
+                
+            </div>
+        </div>   
+    </div>
+
+
+{% endblock %}

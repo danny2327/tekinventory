@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang='en'>
+	<head>
+		<meta charset="UTF-8">
+		<title> {% block title %}{% endblock %}</title>
+        	
+		<link rel="stylesheet" href="{{ base_url() }}/css/bootstrap336.css" />
+		<link rel="stylesheet" href="{{ base_url() }}/css/dark.css" /> 		
+		{# <link rel="stylesheet" href="{{ base_url() }}/css/bootstrap-submenu.css" /> 	 #}	
+
+
+		<script type="text/javascript" src="{{ base_url() }}/js/jquery-3.2.1.js" > </script>
+		{#<script type="text/javascript" src="{{ base_url() }}/js/bootstrap-submenu.js" > </script>#}
+		<!--<script type="text/javascript" src="{{ base_url() }}/js/AddInventory.js"></script>-->
+
+		 
+
+	</head>	
+	<body>
+	{% include 'templates/partials/navigation.twig' %}
+	<div class='container'>
+	{% include 'templates/partials/flash.twig' %}
+					
+		{% block content %}  
+
+
+
+		{% endblock %}	
+		{% block javascript %}{% endblock %}
+	</div>
+
+
+	<script
+	  src="https://code.jquery.com/jquery-2.2.4.min.js"
+	  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+	  crossorigin="anonymous"></script>
+	<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script> -->   
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	</body>
+</html>

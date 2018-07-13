@@ -1,0 +1,42 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory{% endblock %}
+        {% block javascript %}            
+        
+
+        <script type="text/javascript">
+
+        $(document).ready(function() {
+
+            //Check all box
+            $("#all").click(function() {
+                $(".checkColls").prop('checked', $("#all").is(':checked'));
+            });
+        });
+    </script>
+    {% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-4 ">
+           
+            <form method="post" action="{{ path_for( 'reports.coll.post' ) }}">
+                <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input" id="all" type='checkbox'>All
+                        </label>
+                    </div>
+                {% for collection in collections %}
+                    <div class="form-check">
+                        <label class="form-check-label">
+                            <input class="form-check-input checkColls" name="selected{{ collection.collection_id }}" type='checkbox' value="{{ collection.collection_id }}">{{ collection.collection }}
+                        </label>
+                    </div>
+                {% endfor %}   
+                <button class="btn btn-primary" type='submit'>View</button>    
+
+            </form> 
+
+        </div>
+    </div>
+
+{% endblock %}

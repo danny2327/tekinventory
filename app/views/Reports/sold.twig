@@ -1,0 +1,63 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory{% endblock %}
+        {% block javascript %}            
+        
+
+        <script type="text/javascript">
+
+        $(document).ready(function() {
+
+
+ });
+    </script>
+    {% endblock %}
+{% block content %}
+{# {% for entry in sold  %}
+	{{ entry.id }}<p />-------------<p />
+{% endfor %} #}
+
+
+     <div class="row">
+        <div class="col-md-10 ">
+            {{ month }}<p />
+            {% if sold is empty %}
+			  Nothing sold for the month
+			{% endif %}
+{% for entry in sold  %}
+     {% if currentType != entry.id %}
+        </tbody>
+      </table>
+      <table class="table table-bordered table-striped">
+        <caption><strong>Client: </strong>{{ entry.client }} <!-- - {{ entry.collection }}  -->- <i>{{ entry.created_at|slice(0,16) }}</i><br />
+        <strong>Notes: </strong>{{ entry.notes }} </caption>
+        <thead>      
+          <tr>
+            <th>Item ID </th>
+            <th>Item Type </th>
+            <th>Description</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% endif %}
+           {% set currentType = entry.id %}
+          <tr>
+            <td>{{ entry.item_id }}</td>
+            <td>{{ entry.itemType }}</td>
+            <td>{{ entry.desc }}</td>
+            <td>{{ entry.quantity }}
+
+
+            </td>
+          </tr>
+
+        </div>
+
+      {% endfor %}
+        </tbody>
+      </table>
+        </div>
+    </div> 
+
+{% endblock %}
