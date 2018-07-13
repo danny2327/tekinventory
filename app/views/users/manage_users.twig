@@ -1,0 +1,98 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory - Manage Users{% endblock %}
+    {% block javascript %}            
+    
+
+    <script type="text/javascript">
+
+    $(document).ready(function() 
+    { 
+      users = {{ users | json_encode|raw}};
+
+      $('.delete').on('click', function(){
+        var userDelete = $.trim($(this).parent().find('.emailLink').text());
+        console.log(userDelete);
+        for(var i=0;i<users.length;i++) {
+         // console.log(users[i]);
+          if (users[i]['email'] === userDelete){
+            
+            if(confirm("Are you sure you want to delete the user "+userDelete+"?" )) {
+              deleteUser(users[i]['id']);
+            }
+          }          
+        }
+      
+        $(this).parent().remove();
+
+      });
+
+      function deleteUser(id){
+        console.log('There was a problem'); 
+        $.ajax({
+                url: "{{ path_for('home.ajax_deleteUser') }}", 
+                data: {
+                    id: id
+
+                },
+                type: "POST",
+                dataType : "json",
+            })
+
+            .done(function( result ) {
+              if(result)  {
+                console.log('User Deleted');         
+              } else {
+                console.log('There was a problem'); 
+              }
+
+            })
+
+            .fail(function( xhr, status, errorThrown ) {
+              alert(  "Error: " + errorThrown );
+              console.log( "Error: " + errorThrown );
+              console.log( "Status: " + status );
+              console.dir( xhr );
+            });
+        }
+
+
+
+
+      //});
+
+    });
+    </script>
+    {% endblock %}
+
+{% block content %}
+<p />
+
+    <div class="container">
+      <div class="row">
+          <div class="col-md-8 ">
+              <div class="panel panel-default">
+                  <div class="panel-heading">Manage Users<img height = '16' width = '16' src = "{{ base_url() }}/images/info.png" title='This page allows you to manage the existing users' /></div>
+                  <div class="panel-body">
+                      <form method="post" action="{{ path_for('home.postNewUser') }}">    
+                      <ul >
+                          {% for user in users %}
+                            <li>{{ user.name }} - <a title='Edit User' class='emailLink' href="{{ path_for('home.editUser', {'id': user.id}) }}">{{ user.email }}</a> <a class="delete" href="#"><img height = '12' width = '12' src = "{{ base_url() }}/images/x.png" title='Delete User' /></a></li>
+                          {% endfor %}
+                        </ul>
+                            
+                         {{ csrf.field | raw }}
+                      </form>
+                  </div>
+              </div>
+          </div>
+        </div>
+    </div>
+
+
+
+ 
+{% endblock %}
+
+
+

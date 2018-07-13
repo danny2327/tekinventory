@@ -1,0 +1,40 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory{% endblock %}
+        {% block javascript %}            
+        
+
+        <script type="text/javascript">
+
+        $(document).ready(function() {
+
+
+        });
+    </script>
+    {% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12 ">
+
+			<a href = "{{ path_for('reports.all') }}" >View All Inventory</a><br />
+            <a href = "{{ path_for('reports.coll') }}" >View Inventory by Collection</a><br />
+            Sold Items for
+            <form method='POST' action='{{ path_for('reports.sold') }}' >
+                <button type="submit"  class="btn btn-default" name="TwoMonth" value="{{ TwoMonth.year }}-{{ TwoMonth.num }}">{{ TwoMonth.name }}</button>
+                <button type="submit"  class="btn btn-default" name="LastMonth" value="{{ LastMonth.year }}-{{ LastMonth.num }}">{{ LastMonth.name }}</button>
+                <button type="submit"  class="btn btn-default" name="thisMonth" value="{{ thisMonth.year }}-{{ thisMonth.num }}">{{ thisMonth.name }}</button>
+            </form>
+			
+            {#
+                List this month and last 2 name, with option to see more.
+                This month 
+            #}
+			 {#<a href = "{{ path_for('reports.all') }}" >View Inventory by Collection</a><br />
+            }
+            }
+			<a href = "{{ path_for('reports.all') }}" >View Inventory by Collection</a><br /> #}
+
+        </div>
+    </div>
+
+{% endblock %}

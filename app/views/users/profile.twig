@@ -1,0 +1,86 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory - Add User{% endblock %}
+    {% block javascript %}            
+    
+
+    <script type="text/javascript">
+
+    $(document).ready(function() 
+    {
+		$('#error').hide();
+		$('form').on('submit',function(e){
+			$('#error').text('');
+			$('#error').hide();
+			var email = $('#email').val();
+			if(email.slice(-12) !== '@tekworks.ca') {
+				e.preventDefault();
+				$('#error').show();
+				$('#error').text('Email must end in \'@tekworks.ca\'');
+			}
+
+		});
+
+    var old = {{ old |json_encode|raw }};
+    console.log(old);
+    });
+    </script>
+    {% endblock %}
+
+{% block content %}
+<p />
+
+  {% if old.name %}
+  true
+  {% else %}
+  false
+  {% endif %}
+	{% if user %}
+    <div class="row">
+        <div class="col-md-8 ">
+            <div class="panel panel-default">
+                <div class="panel-heading">Edit User<img height = '16' width = '16' src = "{{ base_url() }}/images/info.png" title='This page allows you to edit an existing User' /></div>
+                <div class="panel-body">
+                    <form method="post" action="{{ path_for('home.postEditUser') }}">    
+                      <div class="form-group properties floatLeft"> 
+                        <label for="name">(First) Name</label>
+                        <input class="form-group" type='text' name='name' id='name' required value='{{ old.name ? old.name : user.name }}'></input>
+                        {% if errors.email %}
+                          <span id="emailError" class="help-block alert alert-danger">{{ errors.email | first }}</span>
+                        {% endif %}                                                
+                      </div> 
+                       
+
+                      <div class="form-group properties floatLeft"> 
+                        <label for="email">Email Address</label>
+                        <input class="form-group" type='email' name='email' id='email' value='{{ old.email ? old.email : user.email }}' required></input><br />
+                        <span id="error" class="alert alert-danger"></span>
+                        {% if errors.email %}
+                          <span id="emailError" class="help-block alert alert-danger">{{ errors.email | first }}</span>
+                        {% endif %}                         
+                      </div> 
+
+                      <div class="form-group properties floatLeft"> 
+                        <label for="admin">Administrator Account</label>
+                        <input class="form-group" type='checkbox' name='admin' id='admin' {{ user.isAdmin ? 'checked' : '' }}  value=1 /><br />
+                      </div> 
+
+                      <div class="form-group properties floatLeft">
+                          <button type="submit" class="btn btn-default">Update</button>
+                          <input type="hidden" name="id" value='{{ user.id }}' />
+                          <input type="hidden" name="origEmail" value='{{ user.email }}' />
+                      </div>
+                          
+                       {{ csrf.field | raw }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    	No user with that ID exists.
+    {% endif %}
+
+
+ 
+{% endblock %}

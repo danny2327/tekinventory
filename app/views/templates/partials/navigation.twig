@@ -1,0 +1,146 @@
+<nav class="navbar navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ path_for('home') }}"><img src='{{ base_url() }}/images/tekworksInventoryTitle580x168.png' id='logo' height=42 width=145 /></a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+
+            <ul class="nav navbar-nav">
+
+                <!-- {#**New**#}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> New  <span class="caret"></span><span class="right-caret right"></span></a>
+                    <ul class="dropdown-menu">
+                    </ul>
+                </li> -->
+
+                 {#**Inventory**#}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Inventory  <span class="caret"></span><span class="right-caret right"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ path_for('inventory.add') }}">New Item</a></li>
+                        <li><a href="{{ path_for('inventory.addType') }}">New Item Category</a></li>
+                        <li><a href="{{ path_for('display') }}">View Inventory</a></li>                        
+                        <li class="menu-item dropdown dropdown-submenu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"> View Category</a>
+                        <ul class="dropdown-menu">
+                        {% for category in categories  %}
+                            <li class="menu-item">
+                                <a href="{{ path_for('display.category', {'id': category.id}) }}">
+                                    {{ category.itemType }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                        </ul>
+                        </li>
+                        <li><a href="{{ path_for('inventory.addStock') }}">Add Stock</a></li>
+                        <li><a href="#">View Low Stock (Coming Soon)</a></li>                 
+                    </ul>
+                </li>
+                
+                {#** Collections **#}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Collections  <span class="caret"></span><span class="right-caret right"></span></a>
+                    <ul class="dropdown-menu">                    
+                        <li><a href="{{ path_for('collections.add') }}">New Collection</a></li>  
+                        <li class="menu-item dropdown dropdown-submenu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> View Collection</a>
+                            <ul class="dropdown-menu">
+                            {% for collection in collections  %}
+                                <li class="menu-item">
+                                    <a href="{{ path_for('collections.view', {'id': collection.collection_id}) }}">
+                                        {{ collection.collection }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                            </ul>
+                        </li>
+
+                        <li><a href="{{ path_for('collections.update') }}">Edit Collection</a></li>
+
+                        <li class="menu-item dropdown dropdown-submenu">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> Archive Collection</a>
+                            <ul class="dropdown-menu">
+                            {% for collection in collections  %}
+                                {% if collection.protected==0 %}
+                                    <li class="menu-item">
+                                        <a href="{{ path_for('collections.archive', {'id': collection.collection_id}) }}">
+                                            {{ collection.collection }}
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                            {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+
+                <!--  {#**   Reports   **#}
+                <li><a href="{{ path_for('reports') }}">Reports</a></li> -->
+            
+
+            {#**Administration**#}
+            {% if auth.user.isAdmin %}
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> Administration  <span class="caret"></span><span class="right-caret right"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="{{ path_for('home.newUser') }}">New User</a></li>
+                        <li><a href="{{ path_for('home.manageUsers') }}">Manage Users</a></li>
+                        <li><a href="{{ path_for('reports') }}">Reports</a></li>
+                      <!--   <li><a href="{{ path_for('collections.add') }}">Collection</a></li> -->
+                    </ul>
+                </li>
+            {% endif %}
+            </ul>
+
+             <div class="col-md-3" id="navsearch">
+                <form id='search' action="{{ path_for('search') }}" method="post">  
+                    <div class="input-group mb-2 mr-sm-2 mb-sm-0">
+                        <div class="input-group-addon">
+                            <button type="submit">
+                                <img src='{{ base_url() }}/images/search25.png' height=24 width=24 />
+
+                            </button>
+                        </div>
+                         <input class="form-control" type="text" name="search" placeholder="Search">
+                        {#
+                        <label for "selectSearch">Search In...</label>
+                        <select name ="selectSearch">
+                        <option value="all">All</option>
+                        <optgroup label="Collections">                             
+                            {% for collection in collections %}
+                                <option value="C-{{ collection.collection_id }}" class="dropdown-header">{{ collection.collection }}</option>
+                            {% endfor %}
+
+
+                        <optgroup label="Item Types">
+                             {% for category in categories  %}
+                                <option value="I-{{ category.id }}" class="dropdown-header">{{ category.itemType }}</option>
+                            {% endfor %}
+                        </select> #}
+                    </div>
+                </form>
+            </div> 
+            
+                 {#**auth**#}
+            <ul class="nav navbar-nav navbar-right">
+                {% if auth.check %}
+                    <li class="dropdown">
+                        <a href="" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"> {{ auth.user.name }} <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{{ path_for('auth.signout') }}">Sign out</a></li>
+                        </ul> 
+                    </li>
+                {% else %}
+                    <li><a href="{{ path_for('auth.signin') }}">Sign in</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

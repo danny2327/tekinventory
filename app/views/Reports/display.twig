@@ -1,0 +1,95 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory{% endblock %}
+        {% block javascript %}            
+        
+
+        <script type="text/javascript">
+         // let items = JSON.parse({{ items }});
+          let totalRows = document.querySelectorAll('.totalRow');
+          let grandTotal  = 0;
+
+          for(var i=0;i<totalRows.length;i++){
+         
+            let sumTDs = totalRows[i].parentElement.querySelectorAll('.sum');
+
+            let sum=0;
+            for(var k=0;k<sumTDs.length;k++){
+              sum += parseFloat(sumTDs[k].textContent.slice(1));
+            }       
+            grandTotal+=sum;    
+            totalRows[i].querySelector('.totalCell').textContent = "$"+sum.toFixed(2);
+          };
+
+          document.querySelector('#grandTotal').textContent = "Total: $"+grandTotal.toFixed(2);
+
+
+
+        
+    </script>
+    {% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-8">
+ {% if items is empty %}
+  No Items in this category
+{% endif %}
+    {% set sellPrice = 0 %}
+    {% set buyPrice = 0 %}
+{% for item in items  %}
+  
+     {% if currentType != item.collection_id %}    
+        {% if currentType is defined %}
+
+         <tr class='totalRow'><td></td><td></td><td></td><td></td><td></td><td>Total:</td><td class='totalCell'></td></tr>
+        </tbody>
+          </table>
+      {% endif %}
+     <table class="table table-bordered table-striped">
+      <caption>{{ item.collection }}</caption>
+            <thead>      
+              <tr>
+                <th>Item ID </th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Cost</th>
+                <th>Markup</th>
+                <th>Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+        {% endif %}
+         {% set currentType = item.collection_id %}{# 
+         {% set buyPrice = buyPrice + (item.buyPrice*quantities[item.item_id]) %}
+         {% set sellPrice = sellPrice + (item.sellPrice*quantities[item.item_id]) %} #}
+
+
+        <tr>
+          <td>{{ item.item_id }}</td>
+          <td>{{ item.desc }}</td>
+          <td>{{ quantities[item.collection_id][item.item_id] }} </td>
+          <td>${{ item.buyPrice | number_format(2) }}</td>
+          <td>x{{ item.markup_mult }}</td>                
+          <td>${{ (item.buyPrice * item.markup_mult) | number_format(2) }}</td>             
+          <td class='sum'>${{ (item.buyPrice * item.markup_mult * quantities[item.collection_id][item.item_id]) | number_format(2) }}</td>                
+              
+        </tr>  
+{#         <tr>
+          <td></td>
+          <td></td>
+          <td>Totals</td>
+          <td>${{ buyPrice }}</td>
+          <td>${{ sellPrice }}</td>
+         </tr>   
+        </tr>  #} 
+      {% endfor %}
+ <tr class='totalRow'><td></td><td></td><td></td><td></td><td></td><td>Total:</td><td class='totalCell'></td></tr>
+        </tbody>
+      </table> 
+      <div id='grandTotal' class='col-md-3  col-md-offset-10'></div>  
+            
+
+        </div>
+    </div>
+{% endblock %}

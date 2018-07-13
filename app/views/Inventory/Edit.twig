@@ -1,0 +1,197 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory{% endblock %}
+{% block javascript %}            
+        
+
+        <script type="text/javascript">
+
+        $(document).ready(function() 
+		{
+            item = {{ item |json_encode|raw }};
+            markup = {{ markup |json_encode|raw }};
+
+            updateSellPrice();            
+
+ 			//Ajax to create and label fields.
+		    $(".ajax").css('visibility','hidden');
+
+            var type = item.itemType_id;  
+            var id  = item.item_id;   
+
+		    $.ajax({
+		        url: "{{ path_for('inventory.ajaxItem') }}", 
+		        data: {
+		            type: type,
+		            id: id
+		        },
+		        type: "POST",
+		        dataType : "json",
+		    })
+
+		    .done(function( result ) {		    
+		        $.each(result[0],function(key, value){  
+		            prop = value.property.property;                                       
+		            $("#attrib_"+(key+1)).css('visibility','visible');
+		            $("#attrib_"+(key+1)+" label").text(prop);
+
+		            /*example attrib_2 */
+		            var Att = 'attrib_'+(key+1);
+
+		            /* attribute */
+		            var input = result[1][Att];
+
+		            if(value.property.dataType == "String"){                               
+		               $("#input_"+(key+1)).html(
+		                    '<input type="text" maxlength=45 id="'+Att+'" value = "'+input+'" name="'+Att+'" class="form-control">'
+		                );
+
+		            } else if(value.property.dataType == "Number"){                              
+		               $("#input_"+(key+1)).html(
+		                    '<input type="number" min=0 width=7 id="'+Att+'" value = "'+input+'" name="'+Att+'" class="form-control">'
+		                ); 
+
+		            } else if(value.property.dataType == "Decimal"){                              
+		               $("#input_"+(key+1)).html(
+		                    '<input type="number" step="0.01" min=0 width=7 id="'+Att+'" value = "'+input+'" name="'+Att+'" class="form-control">'
+		                ); 
+
+		            } else if(value.property.dataType == "Boolean"){                              
+		               if(input == 1){
+
+			               $("#input_"+(key+1)).html(
+			                    '<select name="'+Att+'" id="'+Att+'" class="form-control"> <option value="0">No</option><option value="1" selected>Yes</option></select>'
+			                );                                
+			           } else {
+				           	$("#input_"+(key+1)).html(
+				                '<select name="'+Att+'" id="'+Att+'" class="form-control"> <option value="0" selected>No</option><option value="1">Yes</option></select>'
+			                );         
+			           }
+		            }
+
+		            $("#hidden").html('<input type="hidden" id="id" name="id" value="'+type+'"></input>'); 
+
+                    //WTF was this in reference to?
+		            /*Great, it shows up but how the fuck do i get the info in...*/
+		        });
+		    })
+
+		    .fail(function( xhr, status, errorThrown ) {
+		    alert(  "Error: " + errorThrown );
+		    console.log( "Error: " + errorThrown );
+		    console.log( "Status: " + status );
+		    console.dir( xhr );
+		  })
+
+		  // Code to run regardless of success or failure;
+		  .always(function( xhr, status ) {
+		    
+		    });  
+
+          $('#buyPrice').on('change',updateSellPrice);
+
+          function updateSellPrice() {
+            let newCost = $('#buyPrice').val();
+            let newPrice = (newCost*markup).toFixed(2);
+            $('#sellPrice').val('$'+newPrice);
+          }
+
+
+		});
+    </script>
+    {% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">Edit Inventory Item - {{ item.itemType.itemType }} <img height = '16' width = '16' src = "{{ base_url() }}/images/info.png" title='This page allows you to edit the current item' /></div>
+                <div class="panel-body">                        
+
+                    <form id="padded" action="{{ path_for('inventory.edit.post') }}" method="post" autocomplete="off">                    
+
+                        <div class="properties  form-group{{ errors.desc ? ' has-error' : '' }}" >
+                            <label for="desc">Description</label>
+                             <input type="text" id="desc" maxlength=100 size=60 name="desc" class="form-control" value="{{ item.desc }}">
+                             {% if errors.quantity %}
+                                <span class="help-block">{{ errors.quantity | first }}</span>
+                            {% endif %}                            
+                        </div>                    
+                        
+                        <div class="properties form-group{{ errors.buyPrice ? ' has-error' : '' }}" >
+                            <label for="buyPrice">Cost</label>
+                             <input type="number" step="0.01" min=0 size=200 id="buyPrice" name="buyPrice" class="form-control" value = {{ item.buyPrice }}>
+                             {% if errors.buyPrice %}
+                                <span class="help-block">{{ errors.buyPrice | first }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="properties form-group" >
+                            <label for="sellPrice">Sale Price<span class='greyed'> ( x{{ markup }} ) </span></label>
+                            <input class="form-control" id='sellPrice' type="text" readonly>
+                        </div>                        
+                   
+                        <div class="form-group{{ errors.vendor ? ' has-error' : '' }}" >
+                            <label for="vendor">Vendor</label>
+                             <input type="text" maxlength=20 id="vendor" name="vendor" class="form-control" value = "{{ item.vendor }}">
+                             {% if errors.vendor %}
+                                <span class="help-block">{{ errors.vendor | first }}</span>
+                            {% endif %}                            
+                        </div>
+
+                        <div class="form-group{{ errors.vendor_sku ? ' has-error' : '' }}" >
+                            <label for="vendor_sku">Vendor SKU</label>
+                             <input type="text" maxlength=20 id="vendor_sku" name="vendor_sku" class="form-control" value = "{{ item.vendor_sku }}">
+                             {% if errors.vendor_sku %}
+                                <span class="help-block">{{ errors.vendor_sku | first }}</span>
+                            {% endif %}                            
+                        </div>
+                         
+                        <span>{{ item.itemType.itemType }} Specific Properties</span>
+                       
+                            <div id="attrib_1" class="ajax form-group{{ errors.attrib_1 ? ' has-error' : '' }}" >
+                                <label for="attrib_1"></label>
+                                 <div id="input_1"></div>
+                                 {% if errors.attrib_1 %}
+                                    <span class="help-block">{{ errors.attrib_1 | first }}</span>
+                                {% endif %}                            
+                            </div>
+
+                            <div id="attrib_2" class="ajax form-group{{ errors.attrib_2 ? ' has-error' : '' }}" >
+                                <label for="attrib_2"></label>
+                                <div id="input_2"></div>
+                                {% if errors.attrib_2 %}
+                                    <span class="help-block">{{ errors.attrib_2 | first }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div id="attrib_3" class="ajax form-group{{ errors.attrib_3 ? ' has-error' : '' }}" >
+                                <label for="attrib_3"></label>
+                                <div id="input_3"></div>
+                                {% if errors.attrib_3 %}
+                                    <span class="help-block">{{ errors.attrib_3 | first }}</span>
+                                {% endif %}
+                            </div>
+
+                            <div id="attrib_4" class="ajax form-group{{ errors.attrib_4 ? ' has-error' : '' }}" >
+                                <label for="attrib_4"></label>
+                                <div id="input_4"></div>
+                                {% if errors.attrib_4 %}
+                                    <span class="help-block">{{ errors.attrib_4 | first }}</span>
+                                {% endif %}
+                            </div>
+                        <!-- </div>  -->
+                        <div class="form-group properties ">
+                            <button type="submit" class="btn btn-success form-control">Update</button>
+                        </div>
+                        <div id='hidden'></div>
+                       {{ csrf.field | raw }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

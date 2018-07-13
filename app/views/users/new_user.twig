@@ -1,0 +1,82 @@
+
+{% extends 'templates/app.twig' %}
+{% block title %}TekInventory - Add User{% endblock %}
+    {% block javascript %}            
+    
+
+    <script type="text/javascript">
+
+    $(document).ready(function() 
+    { 
+
+
+       //set focus
+        $("#name").focus();
+        //hide error
+        $('#emailError').css('display','none');
+     
+      $('form').on('submit',function(e){
+         $('#emailError').text('');
+        var email = $('#email').val();
+        if(email.slice(-12) !== '@tekworks.ca') {
+          e.preventDefault();
+          $('#emailError').css('display','block');
+          $('#emailError').text('Email must end in \'@tekworks.ca\'');
+        }
+          
+      });
+  
+
+    });
+    </script>
+    {% endblock %}
+
+{% block content %}
+<p />
+
+    <div class="row">
+        <div class="col-md-8 ">
+            <div class="panel panel-default">
+                <div class="panel-heading">Add User<img height = '16' width = '16' src = "{{ base_url() }}/images/info.png" title='This page allows you to add a new User' /></div>
+                <div class="panel-body">
+                    <form method="post" action="{{ path_for('home.postNewUser') }}">    
+                      <div class="form-group properties "> 
+                        <label for="name">(First) Name</label>
+                        <input class="form-control {{ errors.name ? ' has-error' : '' }}" type='text' name='name' id='name' value = "{{ old.name }}" required></input> 
+                        {% if errors.name %}
+                          <span class="help-block alert alert-danger">{{ errors.name | first }}</span>
+                        {% endif %}                          
+                      </div> 
+
+                      <div class="form-group properties "> 
+                        <label for="email">Email Address</label>
+                        <input class="form-control {{ errors.name ? ' has-error' : '' }}" type='email' name='email' id='email' value = "{{ old.email }}" placeholder='<user>@tekworks.ca' required></input><br />
+                        <span id="emailError" class="alert alert-danger"></span>
+                        {% if errors.email %}
+                          <span class="help-block alert alert-danger">{{ errors.email | first }}</span>
+                        {% endif %}                         
+                      </div> 
+
+                      <div class=" properties floatLeft"> 
+                        <label for="admin">Administrator Account</label>
+                        <input class="" type='checkbox' name='admin' id='admin' value=1 /><br /> 
+                      </div> <p />
+
+                      <div class="form-group properties ">
+                          <button type="submit" class="form-control btn btn-default">Create</button>
+                      </div>
+                          
+                       {{ csrf.field | raw }}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+ 
+{% endblock %}
+
+
+
